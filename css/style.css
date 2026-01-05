@@ -75,6 +75,12 @@ body.no-scroll {
   font-size: 1.5rem;
   color: #1645a0;
 }
+.navbar .logo img {
+  height: auto;
+  max-height: 3rem;
+  width: auto;
+  display: block;
+}
 
 .nav-menu {
   position: fixed;
