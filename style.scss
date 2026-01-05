@@ -88,6 +88,12 @@ body {
 		font-weight: 800;
 		font-size: 1.5rem;
 		color: $primary-blue;
+		img {
+			height: auto;
+			max-height: 3rem;
+			width: auto;
+			display: block;
+		}
 	}
 }
 
