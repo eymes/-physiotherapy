@@ -42,6 +42,101 @@ function truncateText(text, maxLength = 200) {
 	return text.substring(0, maxLength).trim() + '...';
 }
 
+// Helper function to process media (images or videos)
+function processMedia(media) {
+	if (!media) return '';
+	
+	// Handle array of media
+	if (Array.isArray(media)) {
+		return media.map(item => processMediaItem(item)).join('');
+	}
+	
+	// Handle single media item
+	return processMediaItem(media);
+}
+
+// Helper function to process a single media item
+function processMediaItem(mediaItem) {
+	if (!mediaItem) return '';
+	
+	// Check if it's a video (has file with video content type or video URL)
+	if (mediaItem.fields && mediaItem.fields.file) {
+		const file = mediaItem.fields.file;
+		const contentType = file.contentType || '';
+		const url = file.url || '';
+		
+		// Check if it's a video
+		if (contentType.startsWith('video/') || url.match(/\.(mp4|webm|ogg|mov)$/i)) {
+			const videoUrl = url.startsWith('//') ? `https:${url}` : url;
+			const title = mediaItem.fields.title || '';
+			return `
+				<div class="blog-post__media blog-post__media--video">
+					<video controls>
+						<source src="${videoUrl}" type="${contentType}">
+						Twoja przeglądarka nie obsługuje odtwarzania wideo.
+					</video>
+				</div>
+			`;
+		}
+		
+		// Otherwise treat as image
+		const imageUrl = url.startsWith('//') ? `https:${url}` : url;
+		const imageAlt = mediaItem.fields.title || mediaItem.fields.description || '';
+		return `
+			<div class="blog-post__media blog-post__media--image">
+				<img src="${imageUrl}" alt="${imageAlt}">
+			</div>
+		`;
+	}
+	
+	// Handle direct URL strings (for videos from external sources)
+	if (typeof mediaItem === 'string') {
+		// Check if it's a video URL
+		if (mediaItem.match(/\.(mp4|webm|ogg|mov)$/i) || mediaItem.includes('youtube.com') || mediaItem.includes('youtu.be') || mediaItem.includes('vimeo.com')) {
+			if (mediaItem.includes('youtube.com') || mediaItem.includes('youtu.be')) {
+				// Extract YouTube video ID
+				const videoId = mediaItem.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+				if (videoId) {
+					return `
+						<div class="blog-post__media blog-post__media--video">
+							<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+						</div>
+					`;
+				}
+			} else if (mediaItem.includes('vimeo.com')) {
+				// Extract Vimeo video ID
+				const videoId = mediaItem.match(/vimeo\.com\/(\d+)/)?.[1];
+				if (videoId) {
+					return `
+						<div class="blog-post__media blog-post__media--video">
+							<iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+						</div>
+					`;
+				}
+			} else {
+				// Direct video URL
+				return `
+					<div class="blog-post__media blog-post__media--video">
+						<video controls>
+							<source src="${mediaItem}">
+							Twoja przeglądarka nie obsługuje odtwarzania wideo.
+						</video>
+					</div>
+				`;
+			}
+		} else {
+			// Treat as image URL
+			return `
+				<div class="blog-post__media blog-post__media--image">
+					<img src="${mediaItem}" alt="">
+				</div>
+			`;
+		}
+	}
+	
+	return '';
+}
+
 // Helper function to process Rich Text content from Contentful
 function processRichText(richText) {
 	if (!richText) return '';
@@ -138,9 +233,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const postsHTML = posts.map((post, index) => {
 			const fields = post.fields;
 			
-			// Get title and article fields
+			// Get title, article, and media fields
 			const title = fields.title || 'Bez tytułu';
 			const article = fields.article || '';
+			const media = fields.media || null;
 			const publishDate = post.sys.createdAt;
 
 			// Format date
@@ -169,7 +265,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 							</div>
 							${hasMoreContent ? `
 								<div class="blog-post__article-full" style="display: none;">
-									${escapeHtml(cleanArticle)}
+									${processMedia(media)}
+									<div class="blog-post__article-text">
+										${escapeHtml(cleanArticle)}
+									</div>
 								</div>
 								<button class="blog-post__read-more btn btn--primary" data-post="${postId}">
 									Czytaj więcej

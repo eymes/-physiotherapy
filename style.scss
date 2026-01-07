@@ -548,7 +548,48 @@ body {
 
 		&-full {
 			margin-bottom: ($grid-unit * 3);
+		}
+
+		&-text {
 			white-space: pre-wrap; // Preserve line breaks and formatting
+			margin-top: ($grid-unit * 4);
+		}
+	}
+
+	&__media {
+		width: 100%;
+		margin-bottom: ($grid-unit * 4);
+		border-radius: $br-radius;
+		overflow: hidden;
+
+		&--image {
+			img {
+				width: 100%;
+				height: auto;
+				display: block;
+				object-fit: cover;
+			}
+		}
+
+		&--video {
+			position: relative;
+			padding-bottom: 56.25%; // 16:9 aspect ratio
+			height: 0;
+			overflow: hidden;
+
+			video,
+			iframe {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				border: none;
+			}
+
+			video {
+				object-fit: contain;
+			}
 		}
 	}
 
@@ -665,12 +706,7 @@ body {
 		}
 	}
 
-	.blog {
-		&__posts {
-			grid-template-columns: repeat(2, 1fr);
-			gap: ($grid-unit * 10);
-		}
-	}
+	// Blog posts stay in single column on all screen sizes
 }
 
 @media (max-width: 768px) {
