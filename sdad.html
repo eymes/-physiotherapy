@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Service Box 80/20</title>
+
+<style>
+  body {
+    background: #fafafa;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+
+  .service-box {
+    border: 1px solid #ddd;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* GŁÓWNY KAFELEK */
+  .service-box__header {
+    display: flex;
+  }
+
+  /* LEWA 80% */
+  .service-box__header-left {
+    width: 80%;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .service-box__title {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .service-box__toggle {
+    width: fit-content;
+    padding: 6px 12px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+
+  /* PRAWA 20% */
+  .service-box__meta {
+    width: 20%;
+    background: #f2f2f2;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .service-box__cost {
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .service-box__time {
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* OPIS – POD KAFELKIEM */
+  .service-box__description-wrapper {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .service-box__description-wrapper.is-open {
+    max-height: 300px;
+  }
+
+  .service-box__description {
+    background: #e6f7e6; /* jasno zielone */
+    padding: 14px;
+    box-sizing: border-box;
+    border-top: 1px solid #cdeacc;
+  }
+</style>
+</head>
+
+<body>
+
+<article class="service-box">
+  <div class="service-box__header">
+    <div class="service-box__header-left">
+      <h2 class="service-box__title">Strzyżenie męskie</h2>
+      <button class="service-box__toggle" aria-expanded="false">
+        Opis*
+      </button>
+    </div>
+
+    <div class="service-box__meta">
+      <span class="service-box__cost">60 zł</span>
+      <span class="service-box__time">30 min</span>
+    </div>
+  </div>
+
+  <!-- OPIS POD KAFELKIEM -->
+  <div class="service-box__description-wrapper" aria-hidden="true">
+    <div class="service-box__description">
+      <p>Profesjonalne strzyżenie dopasowane do kształtu twarzy oraz stylu klienta.</p>
+    </div>
+  </div>
+</article>
+
+<article class="service-box">
+  <div class="service-box__header">
+    <div class="service-box__header-left">
+      <h2 class="service-box__title">Modelowanie brody</h2>
+      <button class="service-box__toggle" aria-expanded="false">
+        Opis*
+      </button>
+    </div>
+
+    <div class="service-box__meta">
+      <span class="service-box__cost">40 zł</span>
+      <span class="service-box__time">20 min</span>
+    </div>
+  </div>
+
+  <div class="service-box__description-wrapper" aria-hidden="true">
+    <div class="service-box__description">
+      <p>Stylizacja i pielęgnacja brody z użyciem kosmetyków premium.</p>
+    </div>
+  </div>
+</article>
+
+<script>
+  document.addEventListener('click', function (e) {
+    const toggle = e.target.closest('.service-box__toggle');
+    if (!toggle) return;
+
+    const box = toggle.closest('.service-box');
+    const wrapper = box.querySelector('.service-box__description-wrapper');
+
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    wrapper.setAttribute('aria-hidden', String(isOpen));
+    wrapper.classList.toggle('is-open', !isOpen);
+  });
+</script>
+
+</body>
+</html>

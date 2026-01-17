@@ -33,12 +33,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		const paddingTop = parseFloat(compStyle.paddingTop) || 0;
 		// Add a small extra offset on larger screens so the section sits a bit lower
 		const extraOffset = window.innerWidth >= 1200 ? 64 : 36; // px (increased slightly)
-		const top =
-			target.getBoundingClientRect().top +
-			window.pageYOffset -
-			headerHeight -
-			paddingTop +
-			extraOffset;
+		let top;
+		if (hash === "#home") {
+			// For home section, scroll to the very top without offset
+			top = 0;
+		} else {
+			top =
+				target.getBoundingClientRect().top +
+				window.pageYOffset -
+				headerHeight -
+				paddingTop +
+				extraOffset;
+		}
 		window.scrollTo({ top, behavior: "smooth" });
 	}
 
@@ -52,7 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
 					if (navMenu.classList.contains("active")) {
 						toggleMenu();
 					}
-					return; // don't preventDefault
+					if (href === "#home") {
+						// For home on mobile, scroll to top instead of default jump
+						e.preventDefault();
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					}
+					return; // don't preventDefault for other links
 				}
 				// Desktop/tablet: smooth offset scrolling
 				e.preventDefault();
