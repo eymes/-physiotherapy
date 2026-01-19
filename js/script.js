@@ -4,6 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	const overlay = document.getElementById("overlay");
 	const body = document.body;
 
+	// Page transition: fade in on load
+	body.classList.add("page-transition-in");
+	setTimeout(() => {
+		body.classList.remove("page-transition-in");
+	}, 400);
+
 	const toggleMenu = () => {
 		navMenu.classList.toggle("active");
 		overlay.classList.toggle("active");
@@ -20,6 +26,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Zamknij menu po kliknięciu w przyciemnienie
 	overlay.addEventListener("click", toggleMenu);
+
+	// Helper function to check if navigating to a different page
+	const isDifferentPage = (href) => {
+		if (!href) return false;
+		
+		// Extract current page name
+		const currentPage = window.location.pathname.split("/").pop() || "index.html";
+		
+		// Extract target page name (handle hash links)
+		let targetPage = href.split("#")[0]; // Remove hash if present
+		if (!targetPage || targetPage === "") {
+			targetPage = "index.html";
+		}
+		
+		// Normalize page names
+		const normalizePage = (page) => {
+			if (page === "" || page === "/") return "index.html";
+			return page;
+		};
+		
+		return normalizePage(currentPage) !== normalizePage(targetPage);
+	};
+
+	// Page transition handler for navigation to uslugi.html and blog.html
+	const handlePageTransition = (e, targetUrl) => {
+		e.preventDefault();
+		
+		// Close menu if open
+		if (navMenu.classList.contains("active")) {
+			toggleMenu();
+		}
+		
+		// Fade out current page
+		body.classList.add("page-transition-out");
+		
+		// Navigate after fade out completes
+		setTimeout(() => {
+			window.location.href = targetUrl;
+		}, 400);
+	};
 
 	// Handle anchor clicks: smooth scroll with offset (navbar height + section padding)
 	const navLinks = document.querySelectorAll(".nav-menu a");
@@ -51,6 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	navLinks.forEach((link) => {
 		link.addEventListener("click", (e) => {
 			const href = link.getAttribute("href");
+			
+			// Handle page transitions for navigation between pages
+			if (href && (href.includes(".html") || href === "uslugi.html" || href === "blog.html" || href === "index.html")) {
+				if (isDifferentPage(href)) {
+					handlePageTransition(e, href);
+					return;
+				}
+			}
+			
 			if (href && href.startsWith("#")) {
 				const isDesktop = window.innerWidth >= 992; // match CSS desktop breakpoint
 				if (!isDesktop) {
@@ -100,6 +155,18 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		});
 	});
+
+	// Handle logo link for page transitions
+	const logoLink = document.querySelector(".logo a");
+	if (logoLink) {
+		logoLink.addEventListener("click", (e) => {
+			const href = logoLink.getAttribute("href");
+			
+			if (href && isDifferentPage(href)) {
+				handlePageTransition(e, href);
+			}
+		});
+	}
 
 	// If page loads with a hash, adjust scroll after load (desktop only)
 	if (window.location.hash && window.innerWidth >= 992) {

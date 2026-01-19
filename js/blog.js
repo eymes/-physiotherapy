@@ -159,6 +159,93 @@ function processRichText(richText) {
 	return String(richText);
 }
 
+// Helper function to check if rich text contains special elements that need full view
+function hasRichTextElements(node) {
+	if (!node) return false;
+	if (typeof node === 'string') return false;
+
+	// List of node types that should trigger "Czytaj więcej" button
+	const richTextNodeTypes = [
+		'unordered-list',
+		'ordered-list',
+		'list-item',
+		'blockquote',
+		'table',
+		'table-row',
+		'table-cell',
+		'table-header-cell',
+		'hr'
+	];
+
+	// Check if current node is one of the special types
+	if (node.nodeType && richTextNodeTypes.includes(node.nodeType)) {
+		return true;
+	}
+
+	// Recursively check children
+	if (node.content && Array.isArray(node.content)) {
+		return node.content.some(child => hasRichTextElements(child));
+	}
+
+	return false;
+}
+
+// Helper function to render Contentful Rich Text to HTML
+function renderRichText(node) {
+	if (!node) return '';
+	if (typeof node === 'string') return node;
+
+	// Handle Text Nodes (bold, italic, etc.)
+	if (node.nodeType === 'text') {
+		let text = escapeHtml(node.value || '');
+		if (node.marks) {
+			node.marks.forEach(mark => {
+				if (mark.type === 'bold') text = `<strong>${text}</strong>`;
+				if (mark.type === 'italic') text = `<em>${text}</em>`;
+				if (mark.type === 'underline') text = `<u>${text}</u>`;
+				if (mark.type === 'code') text = `<code>${text}</code>`;
+			});
+		}
+		return text;
+	}
+
+	// Process children recursively
+	const content = node.content ? node.content.map(child => renderRichText(child)).join('') : '';
+
+	// Map Contentful nodes to HTML tags
+	switch (node.nodeType) {
+		case 'document': return content;
+		case 'paragraph': return `<p>${content}</p>`;
+		case 'heading-1': return `<h3>${content}</h3>`;
+		case 'heading-2': return `<h4>${content}</h4>`;
+		case 'heading-3': return `<h5>${content}</h5>`;
+		case 'heading-4': return `<h6>${content}</h6>`;
+		case 'heading-5': return `<h6>${content}</h6>`;
+		case 'heading-6': return `<h6>${content}</h6>`;
+		case 'unordered-list': return `<ul>${content}</ul>`;
+		case 'ordered-list': return `<ol>${content}</ol>`;
+		case 'list-item': return `<li>${content}</li>`;
+		case 'blockquote': return `<blockquote>${content}</blockquote>`;
+		case 'hr': return '<hr />';
+		
+		// --- NEW TABLE LOGIC STARTS HERE ---
+		case 'table': 
+			return `<div class="table-wrapper"><table><tbody>${content}</tbody></table></div>`;
+		case 'table-row': 
+			return `<tr>${content}</tr>`;
+		case 'table-header-cell': 
+			return `<th>${content}</th>`;
+		case 'table-cell': 
+			return `<td>${content}</td>`;
+		// --- NEW TABLE LOGIC ENDS HERE ---
+
+		case 'hyperlink':
+			const uri = node.data && node.data.uri ? node.data.uri : '#';
+			return `<a href="${uri}" target="_blank" rel="noopener noreferrer">${content}</a>`;
+		default: return content;
+	}
+}
+
 // Extract plain text from Contentful Rich Text
 function extractTextFromRichText(node) {
 	if (!node) return '';
@@ -242,12 +329,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// Format date
 			const formattedDate = formatDate(publishDate);
 
-			// Process article content
-			const fullArticle = processRichText(article);
-			// Remove extra whitespace and normalize
-			const cleanArticle = fullArticle.replace(/\s+/g, ' ').trim();
-			const truncatedArticle = truncateText(cleanArticle, 200);
-			const hasMoreContent = cleanArticle.length > 200;
+			// 1. Process Plain Text for Preview (removes tags so preview looks clean)
+			const plainText = extractTextFromRichText(article);
+			const cleanPlainText = plainText.replace(/\s+/g, ' ').trim();
+			const truncatedArticle = truncateText(cleanPlainText, 200);
+			
+			// 2. Check if content has rich text elements (lists, tables, blockquotes, etc.)
+			const hasRichElements = hasRichTextElements(article);
+			
+			// 3. Show "Czytaj więcej" if text is long OR if it contains rich text elements
+			const hasMoreContent = cleanPlainText.length > 200 || hasRichElements;
+
+			// 4. Process HTML for Full Content (keeps tags like <ul>, <b>, etc.)
+			const fullHtmlContent = renderRichText(article);
 
 			// Create unique ID for this post
 			const postId = `blog-post-${index}`;
@@ -267,7 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 								<div class="blog-post__article-full" style="display: none;">
 									${processMedia(media)}
 									<div class="blog-post__article-text">
-										${escapeHtml(cleanArticle)}
+										${fullHtmlContent}
 									</div>
 								</div>
 								<button class="blog-post__read-more btn btn--primary" data-post="${postId}">
@@ -294,7 +388,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			</div>
 		`;
 
-		// Add event listeners for read more/less buttons
+		// Simple expand/collapse functionality with smooth animation
 		const readMoreButtons = document.querySelectorAll('.blog-post__read-more');
 		const readLessButtons = document.querySelectorAll('.blog-post__read-less');
 
@@ -308,13 +402,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const readLess = post.querySelector('.blog-post__read-less');
 
 				if (preview && full && readMore && readLess) {
+					// Hide preview and read more button
 					preview.style.display = 'none';
-					full.style.display = 'block';
 					readMore.style.display = 'none';
+					
+					// Show full content container first
+					full.style.display = 'block';
+					full.style.maxHeight = '0';
+					full.style.opacity = '0';
+					
+					// Force reflow
+					void full.offsetHeight;
+					
+					// Get actual height and animate
+					const fullHeight = full.scrollHeight;
+					full.classList.add('expanded');
+					full.style.maxHeight = fullHeight + 'px';
+					full.style.opacity = '1';
+					
+					// Show read less button
 					readLess.style.display = 'inline-block';
 					
-					// Smooth scroll to top of article
-					post.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					// Smooth scroll to article
+					setTimeout(() => {
+						post.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}, 100);
 				}
 			});
 		});
@@ -329,13 +441,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const readLess = post.querySelector('.blog-post__read-less');
 
 				if (preview && full && readMore && readLess) {
-					preview.style.display = 'block';
-					full.style.display = 'none';
-					readMore.style.display = 'inline-block';
+					// Collapse animation
+					full.style.maxHeight = full.scrollHeight + 'px';
+					void full.offsetHeight; // Force reflow
+					
+					full.classList.remove('expanded');
+					full.style.maxHeight = '0';
+					full.style.opacity = '0';
+					
+					// Hide read less button
 					readLess.style.display = 'none';
 					
-					// Smooth scroll to top of article
-					post.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					// After animation completes, hide full and show preview
+					setTimeout(() => {
+						full.style.display = 'none';
+						preview.style.display = 'block';
+						readMore.style.display = 'inline-block';
+						
+						// Smooth scroll to article
+						post.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}, 800);
 				}
 			});
 		});
