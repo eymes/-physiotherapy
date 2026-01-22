@@ -663,6 +663,7 @@ body.blog-page main {
 }
 .uslugi__wrapper {
   width: 100%;
+  overflow-x: hidden;
 }
 .uslugi__services {
   display: grid;
@@ -683,6 +684,7 @@ body.blog-page main {
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem;
+  align-items: stretch;
 }
 
 .service-card {
@@ -690,16 +692,19 @@ body.blog-page main {
   background-color: #ffffff;
   border: none;
   border-radius: 0.5rem;
-  padding: 2.5rem;
+  padding: 2rem 2rem 2.5rem 2rem;
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   min-height: 280px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 .service-card__badge {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
+  top: 1.5rem;
+  left: 1.5rem;
   width: 3.75rem;
   height: 3.75rem;
   background-color: #daeee7;
@@ -791,6 +796,14 @@ body.blog-page main {
 @media (min-width: 560px) {
   .uslugi__grid {
     grid-template-columns: repeat(2, 1fr);
+    align-items: stretch;
+    gap: 2rem;
+  }
+  .service-card {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
   }
   .service-card__title {
     margin-bottom: 1rem;
@@ -800,9 +813,19 @@ body.blog-page main {
   .uslugi__grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 4rem;
+    align-items: stretch;
+  }
+  .service-card {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
   }
 }
 @media (min-width: 1400px) {
+  .uslugi__grid {
+    gap: 3rem;
+  }
   .service-card__badge {
     width: 4.25rem;
     height: 4.25rem;
@@ -814,7 +837,7 @@ body.blog-page main {
     font-size: 0.875rem;
   }
   .service-card__title {
-    font-size: calc(clamp(1.1rem, 3vw, 1.4rem) + 0.3rem);
+    font-size: calc(clamp(1.1rem, 3vw, 1.4rem) + 0.18rem);
   }
   .service-card__btn {
     font-size: 1.1rem;

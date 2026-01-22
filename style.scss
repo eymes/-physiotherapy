@@ -755,6 +755,7 @@ body {
 
 	&__wrapper {
 		width: 100%;
+		overflow-x: hidden; // Zapobiega wystawaniu poza kontener
 	}
 
 	&__services {
@@ -783,6 +784,7 @@ body {
 		display: grid;
 		grid-template-columns: 1fr;
 		gap: ($grid-unit * 6);
+		align-items: stretch; // Wszystkie karty w rzędzie mają jednakową wysokość
 	}
 }
 
@@ -792,16 +794,19 @@ body {
 	background-color: #ffffff;
 	border: none;
 	border-radius: $br-radius;
-	padding: ($grid-unit * 5);
+	padding: ($grid-unit * 4) ($grid-unit * 4) ($grid-unit * 5) ($grid-unit * 4); // Mniejszy padding z góry i z lewej
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	width: 100%; // Zapewnia pełną szerokość w gridzie
 	min-height: 280px; // Zapewnia jednakową minimalną wysokość
+	box-sizing: border-box; // Padding wliczony w szerokość
+	max-width: 100%; // Zapobiega przekroczeniu szerokości
 
 	&__badge {
 		position: absolute;
-		top: ($grid-unit * 4);
-		left: ($grid-unit * 4);
+		top: ($grid-unit * 3); // Delikatnie wyżej
+		left: ($grid-unit * 3); // Delikatnie bardziej w lewo
 		width: 3.75rem; // 60px
 		height: 3.75rem; // 60px
 		background-color: #daeee7; // Mietowy kolor
@@ -910,9 +915,16 @@ body {
 @media (min-width: 560px) {
 	.uslugi__grid {
 		grid-template-columns: repeat(2, 1fr);
+		align-items: stretch; // Wszystkie karty w rzędzie mają jednakową wysokość
+		gap: ($grid-unit * 4); // Mniejszy gap na mniejszych ekranach
 	}
 
 	.service-card {
+		width: 100%; // Zapewnia pełną szerokość w gridzie
+		box-sizing: border-box; // Padding wliczony w szerokość
+		max-width: 100%; // Zapobiega przekroczeniu szerokości
+		min-width: 0; // Pozwala gridowi na prawidłowe obliczenie szerokości
+
 		&__title {
 			margin-bottom: (
 				$grid-unit * 2
@@ -925,10 +937,24 @@ body {
 	.uslugi__grid {
 		grid-template-columns: repeat(3, 1fr);
 		gap: ($grid-unit * 8);
+		align-items: stretch; // Wszystkie karty w rzędzie mają jednakową wysokość
+	}
+
+	.service-card {
+		width: 100%; // Zapewnia pełną szerokość w gridzie
+		box-sizing: border-box; // Padding wliczony w szerokość
+		max-width: 100%; // Zapobiega przekroczeniu szerokości
+		min-width: 0; // Pozwala gridowi na prawidłowe obliczenie szerokości
 	}
 }
 
 @media (min-width: 1400px) {
+	.uslugi__grid {
+		gap: (
+			$grid-unit * 6
+		); // Mniejszy gap na największych ekranach - więcej białego kafelka
+	}
+
 	.service-card {
 		&__badge {
 			width: 4.25rem; // Delikatnie większy kwadrat
@@ -945,7 +971,7 @@ body {
 
 		&__title {
 			font-size: calc(
-				clamp(1.1rem, 3vw, 1.4rem) + 0.3rem
+				clamp(1.1rem, 3vw, 1.4rem) + 0.18rem
 			); // Tytuł o 0.5rem większy
 		}
 
