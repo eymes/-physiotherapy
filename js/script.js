@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	const overlay = document.getElementById("overlay");
 	const body = document.body;
 
-	// Page transition: fade in on load
-	body.classList.add("page-transition-in");
-	setTimeout(() => {
-		body.classList.remove("page-transition-in");
-	}, 400);
+	// Prevent the browser from doing its own "early" hash jump before our offset logic runs.
+	// This is especially important when the page layout shifts after load (e.g. 3rd-party widgets).
+	if ("scrollRestoration" in history) {
+		history.scrollRestoration = "manual";
+	}
 
 	const toggleMenu = () => {
 		navMenu.classList.toggle("active");
@@ -27,58 +27,18 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Zamknij menu po kliknięciu w przyciemnienie
 	overlay.addEventListener("click", toggleMenu);
 
-	// Helper function to check if navigating to a different page
-	const isDifferentPage = (href) => {
-		if (!href) return false;
-		
-		// Extract current page name
-		const currentPage = window.location.pathname.split("/").pop() || "index.html";
-		
-		// Extract target page name (handle hash links)
-		let targetPage = href.split("#")[0]; // Remove hash if present
-		if (!targetPage || targetPage === "") {
-			targetPage = "index.html";
-		}
-		
-		// Normalize page names
-		const normalizePage = (page) => {
-			if (page === "" || page === "/") return "index.html";
-			return page;
-		};
-		
-		return normalizePage(currentPage) !== normalizePage(targetPage);
-	};
-
-	// Page transition handler for navigation to uslugi.html and blog.html
-	const handlePageTransition = (e, targetUrl) => {
-		e.preventDefault();
-		
-		// Close menu if open
-		if (navMenu.classList.contains("active")) {
-			toggleMenu();
-		}
-		
-		// Fade out current page
-		body.classList.add("page-transition-out");
-		
-		// Navigate after fade out completes
-		setTimeout(() => {
-			window.location.href = targetUrl;
-		}, 400);
-	};
-
 	// Handle anchor clicks: smooth scroll with offset (navbar height + section padding)
 	const navLinks = document.querySelectorAll(".nav-menu a");
-	function scrollToSectionAndOffset(hash) {
+	function getTopForHash(hash) {
 		if (!hash || hash === "#") return;
 		const target = document.querySelector(hash);
 		if (!target) return;
 		const header = document.querySelector(".navbar");
 		const headerHeight = header ? header.offsetHeight : 0;
-		const compStyle = getComputedStyle(target);
-		const paddingTop = parseFloat(compStyle.paddingTop) || 0;
-		// Add a small extra offset on larger screens so the section sits a bit lower
-		const extraOffset = window.innerWidth >= 1200 ? 64 : 36; // px (increased slightly)
+		// Extra breathing room so the section title isn't glued to the navbar.
+		// (Do NOT subtract section padding — that was causing "too high" scroll on padded sections.)
+		// If you want the section to start exactly under the fixed navbar, keep this at 0.
+		const extraOffset = 0; // px
 		let top;
 		if (hash === "#home") {
 			// For home section, scroll to the very top without offset
@@ -87,40 +47,58 @@ document.addEventListener("DOMContentLoaded", () => {
 			top =
 				target.getBoundingClientRect().top +
 				window.pageYOffset -
-				headerHeight -
-				paddingTop +
+				headerHeight +
 				extraOffset;
 		}
-		window.scrollTo({ top, behavior: "smooth" });
+		return top;
+	}
+
+	function scrollToSectionAndOffset(hash, behavior = "smooth") {
+		const top = getTopForHash(hash);
+		if (typeof top !== "number") return;
+		window.scrollTo({ top, behavior });
+	}
+
+	// When landing on a URL with a hash (e.g. index.html#contact), the layout may still shift
+	// after DOMContentLoaded (images, iframes, and especially 3rd-party widgets).
+	// We "settle" the scroll a few times until the target position stabilizes.
+	function settleAndScrollToHash(hash) {
+		const maxAttempts = 20;
+		let attempts = 0;
+		let lastDesiredTop = null;
+
+		const tick = () => {
+			attempts += 1;
+			const desiredTop = getTopForHash(hash);
+			if (typeof desiredTop !== "number") return;
+
+			const y = window.pageYOffset;
+			const closeEnough = Math.abs(y - desiredTop) <= 2;
+			const stableEnough =
+				lastDesiredTop !== null && Math.abs(lastDesiredTop - desiredTop) <= 1;
+
+			// Use "auto" here to correct position without a long smooth animation fight.
+			if (!closeEnough) {
+				window.scrollTo({ top: desiredTop, behavior: "auto" });
+			}
+
+			if (attempts >= maxAttempts || (closeEnough && stableEnough)) return;
+
+			lastDesiredTop = desiredTop;
+			// Give the browser a moment to apply layout changes between attempts.
+			setTimeout(() => requestAnimationFrame(tick), 80);
+		};
+
+		// Start on the next frame so initial styles are applied.
+		requestAnimationFrame(tick);
 	}
 
 	navLinks.forEach((link) => {
 		link.addEventListener("click", (e) => {
 			const href = link.getAttribute("href");
 			
-			// Handle page transitions for navigation between pages
-			if (href && (href.includes(".html") || href === "uslugi.html" || href === "blog.html" || href === "index.html")) {
-				if (isDifferentPage(href)) {
-					handlePageTransition(e, href);
-					return;
-				}
-			}
-			
 			if (href && href.startsWith("#")) {
-				const isDesktop = window.innerWidth >= 992; // match CSS desktop breakpoint
-				if (!isDesktop) {
-					// on mobile keep native behavior: close menu if open and allow default jump
-					if (navMenu.classList.contains("active")) {
-						toggleMenu();
-					}
-					if (href === "#home") {
-						// For home on mobile, scroll to top instead of default jump
-						e.preventDefault();
-						window.scrollTo({ top: 0, behavior: "smooth" });
-					}
-					return; // don't preventDefault for other links
-				}
-				// Desktop/tablet: smooth offset scrolling
+				// All viewports: use offset scrolling so fixed navbar doesn't cover the section.
 				e.preventDefault();
 				const perform = () => scrollToSectionAndOffset(href);
 				if (navMenu.classList.contains("active")) {
@@ -141,35 +119,22 @@ document.addEventListener("DOMContentLoaded", () => {
 		link.addEventListener("click", (e) => {
 			const href = link.getAttribute("href");
 			if (href && href.startsWith("#")) {
-				const isDesktop = window.innerWidth >= 992;
-				if (!isDesktop) {
-					// on mobile keep native behavior: close menu if open and allow default jump
-					if (navMenu.classList.contains("active")) {
-						toggleMenu();
-					}
-					return; // don't preventDefault
-				}
-				// Desktop/tablet: smooth offset scrolling
+				// All viewports: use offset scrolling so fixed navbar doesn't cover the section.
 				e.preventDefault();
 				scrollToSectionAndOffset(href);
 			}
 		});
 	});
 
-	// Handle logo link for page transitions
-	const logoLink = document.querySelector(".logo a");
-	if (logoLink) {
-		logoLink.addEventListener("click", (e) => {
-			const href = logoLink.getAttribute("href");
-			
-			if (href && isDifferentPage(href)) {
-				handlePageTransition(e, href);
-			}
-		});
-	}
-
-	// If page loads with a hash, adjust scroll after load (desktop only)
-	if (window.location.hash && window.innerWidth >= 992) {
-		setTimeout(() => scrollToSectionAndOffset(window.location.hash), 100);
+	// If page loads with a hash, adjust scroll after full load (all viewports),
+	// and keep correcting while the page layout settles.
+	const shouldHandleInitialHash = !!window.location.hash;
+	if (shouldHandleInitialHash) {
+		const run = () => settleAndScrollToHash(window.location.hash);
+		if (document.readyState === "complete") {
+			run();
+		} else {
+			window.addEventListener("load", run, { once: true });
+		}
 	}
 });

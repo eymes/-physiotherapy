@@ -33,7 +33,6 @@ body {
 	flex-direction: column;
 	min-height: 100vh;
 	opacity: 1;
-	transition: opacity 0.4s ease-in-out;
 	&.no-scroll {
 		overflow: hidden;
 	}
@@ -41,21 +40,6 @@ body {
 		main {
 			flex: 1;
 		}
-	}
-	&.page-transition-out {
-		opacity: 0;
-	}
-	&.page-transition-in {
-		animation: fadeIn 0.4s ease-in-out;
-	}
-}
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
 	}
 }
 
@@ -113,16 +97,24 @@ body {
 		font-weight: 800;
 		font-size: 1.5rem;
 		color: $primary-blue;
+		// Slightly shift logo to the left for better visual alignment in the navbar.
+		margin-left: -1rem;
 		a {
 			text-decoration: none;
 			display: block;
 		}
 		img {
 			height: auto;
-			max-height: 3rem;
+			max-height: 4.5rem;
 			width: auto;
 			display: block;
 		}
+	}
+}
+
+@media (min-width: 1200px) {
+	.navbar .logo img {
+		max-height: 5.5rem;
 	}
 }
 
@@ -244,6 +236,12 @@ body {
 			margin-bottom: ($grid-unit * 5);
 			font-weight: 500;
 		}
+	}
+}
+
+@media (min-width: 1200px) {
+	.hero__content h1 {
+		font-size: 5.5rem;
 	}
 }
 
@@ -461,7 +459,7 @@ body {
 	padding: ($grid-unit * 12) 0;
 	display: flex;
 	align-items: center;
-	
+
 	.container {
 		width: 100%;
 		max-width: 1200px;
@@ -582,10 +580,10 @@ body {
 		}
 
 		&-text {
-			// 1. IMPORTANT: Remove 'white-space: pre-wrap'. 
+			// 1. IMPORTANT: Remove 'white-space: pre-wrap'.
 			// It conflicts with real HTML tags like tables and lists.
-			// white-space: pre-wrap; 
-			
+			// white-space: pre-wrap;
+
 			margin-top: ($grid-unit * 4);
 			color: $text-dark;
 			font-size: 1rem;
@@ -597,7 +595,8 @@ body {
 			}
 
 			// 3. Fix Lists (This makes bullet points visible!)
-			ul, ol {
+			ul,
+			ol {
 				margin-bottom: 1.5rem;
 				padding-left: 2rem; // Adds space for the bullets
 			}
@@ -641,8 +640,9 @@ body {
 			table {
 				width: 100%;
 				border-collapse: collapse;
-				
-				th, td {
+
+				th,
+				td {
 					padding: 0.75rem 1rem;
 					border: 1px solid rgba($primary-blue, 0.2); // visible borders
 					text-align: left;
@@ -653,7 +653,7 @@ body {
 					font-weight: 700;
 					color: $primary-blue;
 				}
-				
+
 				// Striped rows for better readability
 				tr:nth-child(even) {
 					background-color: rgba($primary-blue, 0.02);
@@ -661,13 +661,15 @@ body {
 			}
 
 			// 6. Fix Headings inside the article
-			h3, h4, h5 {
+			h3,
+			h4,
+			h5 {
 				color: $primary-blue;
 				margin-top: 2rem;
 				margin-bottom: 1rem;
 				font-weight: 700;
 			}
-			
+
 			// 7. Fix Links
 			a {
 				color: $primary-blue;
@@ -676,7 +678,7 @@ body {
 					color: $accent-teal;
 				}
 			}
-			
+
 			// 8. Fix Horizontal Rules (lines)
 			hr {
 				border: 0;
@@ -736,7 +738,7 @@ body {
 		border: none;
 		border-radius: $br-radius;
 		transition: all $transition;
-		
+
 		&:hover {
 			background-color: darken($primary-blue, 10%);
 			transform: translateY(-2px);
@@ -776,6 +778,280 @@ body {
 			margin-bottom: ($grid-unit * 2);
 		}
 	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: ($grid-unit * 6);
+	}
+}
+
+// --- 7.7. NOWE KARTY USŁUG (SERVICE CARDS) ---
+.service-card {
+	position: relative;
+	background-color: #ffffff;
+	border: none;
+	border-radius: $br-radius;
+	padding: ($grid-unit * 5);
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 280px; // Zapewnia jednakową minimalną wysokość
+
+	&__badge {
+		position: absolute;
+		top: ($grid-unit * 4);
+		left: ($grid-unit * 4);
+		width: 3.75rem; // 60px
+		height: 3.75rem; // 60px
+		background-color: #daeee7; // Mietowy kolor
+		border-radius: $br-radius;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1;
+	}
+
+	&__badge-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: ($grid-unit * 0.5);
+		text-align: center;
+	}
+
+	&__price {
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: darken($contact-bg, 30%); // Mietowy ale ciemniejszy
+		line-height: 1.2;
+	}
+
+	&__time {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: darken($contact-bg, 30%); // Mietowy ale ciemniejszy
+		line-height: 1.2;
+	}
+
+	&__content {
+		margin-top: 6.25rem; // Większy odstęp od kwadratu z ceną i czasem
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		min-height: 0; // Pozwala flexbox na równomierne rozłożenie
+	}
+
+	&__title {
+		font-size: clamp(1.1rem, 3vw, 1.4rem);
+		color: $primary-blue; // Niebieski
+		font-weight: 700;
+		line-height: 1.3;
+		margin-bottom: ($grid-unit * 4);
+		flex-grow: 1;
+		min-height: 3.5em; // Zapewnia jednakową wysokość dla tytułów (3.5 linii)
+		display: flex;
+		align-items: flex-start;
+	}
+
+	&__btn {
+		display: flex;
+		align-items: center;
+		gap: ($grid-unit * 1);
+		width: 100%;
+		justify-content: flex-start;
+		padding: ($grid-unit * 1) 0;
+		background-color: transparent; // Bez tła
+		color: darken($contact-bg, 20%); // Mietowy kolor tekstu
+		border: none;
+		border-radius: $br-radius;
+		font-size: 1rem;
+		font-weight: 400;
+		cursor: pointer;
+		transition: color $transition;
+		margin-top: auto;
+
+		&:hover {
+			color: darken($contact-bg, 40%);
+
+			.service-card__btn-arrow {
+				transform: translateX(0.55rem);
+			}
+		}
+
+		&:active {
+			transform: translateY(0);
+		}
+	}
+
+	&__btn-arrow {
+		display: inline-block;
+		transition: transform $transition;
+		font-size: 1.2rem;
+		line-height: 1;
+		margin-left: ($grid-unit * 0.5);
+		color: inherit; // Dziedziczy kolor z przycisku
+	}
+}
+
+// Responsywny grid dla kart usług
+@media (max-width: 559px) {
+	.service-card {
+		&__title {
+			font-size: clamp(1.3rem, 4vw, 1.5rem); // Większy tytuł na mobile
+			margin-bottom: (
+				$grid-unit * 2
+			); // Mniejszy odstęp między tytułem a opisem
+		}
+	}
+}
+
+@media (min-width: 560px) {
+	.uslugi__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.service-card {
+		&__title {
+			margin-bottom: (
+				$grid-unit * 2
+			); // Mniejszy odstęp między tytułem a opisem na średnich ekranach
+		}
+	}
+}
+
+@media (min-width: 1024px) {
+	.uslugi__grid {
+		grid-template-columns: repeat(3, 1fr);
+		gap: ($grid-unit * 8);
+	}
+}
+
+@media (min-width: 1400px) {
+	.service-card {
+		&__badge {
+			width: 4.25rem; // Delikatnie większy kwadrat
+			height: 4.25rem;
+		}
+
+		&__price {
+			font-size: 1rem; // Większy rozmiar ceny
+		}
+
+		&__time {
+			font-size: 0.875rem; // Większy rozmiar czasu
+		}
+
+		&__title {
+			font-size: calc(
+				clamp(1.1rem, 3vw, 1.4rem) + 0.3rem
+			); // Tytuł o 0.5rem większy
+		}
+
+		&__btn {
+			font-size: 1.1rem; // Delikatnie większy przycisk opis
+		}
+	}
+}
+
+// --- 7.8. MODAL DLA OPISU USŁUGI ---
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	z-index: 2000;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+
+	&.active {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
+.modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0.9);
+	background-color: #ffffff;
+	border-radius: $br-radius;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	max-width: 90%;
+	width: 100%;
+	max-width: 600px;
+	max-height: 90vh;
+	overflow-y: auto;
+	z-index: 2001;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+
+	&.active {
+		opacity: 1;
+		visibility: visible;
+		transform: translate(-50%, -50%) scale(1);
+	}
+
+	&__close {
+		position: absolute;
+		top: ($grid-unit * 2);
+		right: ($grid-unit * 2);
+		width: 2.5rem;
+		height: 2.5rem;
+		background: none;
+		border: none;
+		font-size: 2rem;
+		color: $text-dark;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		transition: background-color $transition, color $transition;
+		z-index: 10;
+		line-height: 1;
+
+		&:hover {
+			background-color: rgba($text-dark, 0.1);
+			color: $primary-blue;
+		}
+
+		&:focus {
+			outline: 2px solid $primary-blue;
+			outline-offset: 2px;
+		}
+	}
+
+	&__content {
+		padding: ($grid-unit * 8) ($grid-unit * 6);
+	}
+
+	&__title {
+		font-size: clamp(1.5rem, 4vw, 2rem);
+		color: $primary-blue;
+		margin-bottom: ($grid-unit * 4);
+		font-weight: 700;
+		line-height: 1.3;
+	}
+
+	&__description {
+		font-size: 1.1rem;
+		line-height: 1.7;
+		color: $text-dark;
+		opacity: 0.9;
+
+		p {
+			margin-bottom: ($grid-unit * 2);
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
 }
 
 .service-box {
@@ -805,7 +1081,7 @@ body {
 		line-height: 1.3;
 		margin: 0 0 0.5rem 0;
 	}
-	
+
 	&__toggle {
 		display: inline-block;
 		font-size: 0.9rem;
@@ -851,32 +1127,43 @@ body {
 		color: $text-dark;
 		opacity: 0.9;
 		transition: all 0.3s ease;
-		
+
 		// FORMATTING RULES (Copied from blog)
 		p {
 			margin-bottom: 0.8rem;
-			&:last-child { margin-bottom: 0; }
+			&:last-child {
+				margin-bottom: 0;
+			}
 		}
 
-		ul, ol {
+		ul,
+		ol {
 			margin-bottom: 1rem;
 			padding-left: 1.5rem; // Required for bullets to show
 		}
-		
-		ul { list-style-type: disc; }
-		ol { list-style-type: decimal; }
+
+		ul {
+			list-style-type: disc;
+		}
+		ol {
+			list-style-type: decimal;
+		}
 
 		li {
 			margin-bottom: 0.3rem;
 			// Fix for contentful wrapping li in p
-			p { display: inline; margin: 0; } 
+			p {
+				display: inline;
+				margin: 0;
+			}
 		}
 
-		strong, b {
+		strong,
+		b {
 			font-weight: 700;
 			color: $text-dark;
 		}
-		
+
 		a {
 			color: $primary-blue;
 			text-decoration: underline;
@@ -1018,7 +1305,8 @@ body {
 					margin-bottom: 0.875rem; // Slightly reduced
 				}
 
-				ul, ol {
+				ul,
+				ol {
 					margin-bottom: 1.25rem;
 					padding-left: 1.5rem; // Reduced from 2rem
 				}
@@ -1032,7 +1320,9 @@ body {
 					margin: 1.25rem 0;
 				}
 
-				h3, h4, h5 {
+				h3,
+				h4,
+				h5 {
 					margin-top: 1.5rem;
 					margin-bottom: 0.875rem;
 					font-size: 1.1rem; // Smaller headings on mobile
