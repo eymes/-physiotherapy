@@ -146,6 +146,7 @@ body {
 			color: $text-dark;
 			font-size: 1.2rem;
 			font-weight: 500;
+			transition: color 0.3s ease;
 			&:hover {
 				color: $primary-blue;
 			}
@@ -298,6 +299,47 @@ body {
 				z-index: 1;
 			}
 		}
+		// Lista „Ukończone szkolenia” pod zdjęciem – odstęp od image-box, kolory z zmiennych
+		&__features-wrap {
+			margin-top: ($grid-unit * 9);
+			padding-top: 0 ($grid-unit * 0.5);
+			position: relative;
+			z-index: 1;
+		}
+		.about__features-title {
+			font-size: 1rem;
+			font-weight: 700;
+			color: $primary-blue;
+			margin-top: ($grid-unit * 5.5);
+
+			margin-bottom: ($grid-unit * 1.5);
+			opacity: 0.95;
+		}
+		.about__features {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			li {
+				position: relative;
+				padding-left: ($grid-unit * 3);
+				margin-bottom: ($grid-unit * 1.25);
+				font-size: 0.8125rem;
+				font-weight: 500;
+				color: $text-dark;
+				opacity: 0.9;
+				&::before {
+					content: "";
+					position: absolute;
+					left: 0;
+					top: 50%;
+					transform: translateY(-50%);
+					width: 6px;
+					height: 6px;
+					background-color: $accent-teal;
+					border-radius: 50%;
+				}
+			}
+		}
 	}
 	&__content {
 		order: 1;
@@ -320,27 +362,6 @@ body {
 			font-size: 1.125rem;
 			margin-bottom: ($grid-unit * 3);
 			opacity: 0.9;
-		}
-		.about__features {
-			list-style: none;
-			margin-top: ($grid-unit * 4);
-			li {
-				position: relative;
-				padding-left: ($grid-unit * 4);
-				margin-bottom: $grid-unit;
-				font-weight: 600;
-				&::before {
-					content: "";
-					position: absolute;
-					left: 0;
-					top: 50%;
-					transform: translateY(-50%);
-					width: 8px;
-					height: 8px;
-					background-color: $accent-teal;
-					border-radius: 50%;
-				}
-			}
 		}
 	}
 }
@@ -400,6 +421,39 @@ body {
 						text-decoration: underline;
 					}
 				}
+				// Telefon w kolorze tekstu (bez niebieskiego)
+				&:nth-child(2) a {
+					color: $text-dark;
+					&:hover {
+						color: $text-dark;
+						opacity: 0.9;
+						text-decoration: none;
+					}
+				}
+			}
+		}
+		.contact__socials {
+			display: flex;
+			gap: ($grid-unit * 1.5);
+			margin-top: ($grid-unit * 2.5);
+		}
+		.contact__social-link {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			color: $text-dark;
+			cursor: pointer;
+			outline: none;
+			-webkit-tap-highlight-color: transparent;
+			&:hover,
+			&:focus,
+			&:active {
+				color: $text-dark;
+			}
+			svg {
+				width: 28px;
+				height: 28px;
+				display: block;
 			}
 		}
 	}
@@ -456,7 +510,7 @@ body {
 .reviews {
 	min-height: auto;
 	background-color: $bg-color;
-	padding: ($grid-unit * 12) 0;
+	padding: ($grid-unit * 1) 0 ($grid-unit * 12) 0;
 	display: flex;
 	align-items: center;
 
@@ -903,11 +957,18 @@ body {
 // Responsywny grid dla kart usług
 @media (max-width: 559px) {
 	.service-card {
+		padding-bottom: ($grid-unit * 3); // Mniej białego kafelka pod opisem
+		&__content {
+			margin-top: 5rem; // Mniejszy odstęp między boxem (cena/czas) a tytułem
+		}
 		&__title {
 			font-size: clamp(1.3rem, 4vw, 1.5rem); // Większy tytuł na mobile
 			margin-bottom: (
-				$grid-unit * 2
-			); // Mniejszy odstęp między tytułem a opisem
+				$grid-unit * 1.5
+			); // Delikatnie mniejszy odstęp między tytułem a opisem
+		}
+		&__btn {
+			margin-bottom: ($grid-unit * 1.5); // Tyle samo pod opisem
 		}
 	}
 }
@@ -1053,7 +1114,7 @@ body {
 	}
 
 	&__content {
-		padding: ($grid-unit * 8) ($grid-unit * 6);
+		padding: ($grid-unit * 10) ($grid-unit * 7);
 	}
 
 	&__title {
@@ -1224,20 +1285,35 @@ body {
 		opacity: 0.7;
 	}
 
+	&__socials {
+		display: flex;
+		gap: ($grid-unit * 1.5);
+		align-items: center;
+	}
+
 	&__link {
-		color: $bg-color;
-		transition: color $transition, transform $transition;
-		display: inline-block;
+		color: $accent-teal;
+		transition: transform $transition;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		outline: none;
+		-webkit-tap-highlight-color: transparent;
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: $accent-teal;
+		}
 
 		&:hover {
-			color: $accent-teal;
-			transform: translateY(-3px);
+			transform: translateY(-2px);
 		}
 
 		svg {
-			width: 32px;
-			height: 32px;
-			fill: currentColor;
+			width: 28px;
+			height: 28px;
+			display: block;
 		}
 	}
 }
@@ -1266,6 +1342,7 @@ body {
 		&__wrapper {
 			grid-template-columns: 1fr 1.2fr;
 			gap: ($grid-unit * 12);
+			align-items: start; /* prawa kolumna (tekst) od góry, nie wyśrodkowana względem zdjęcia */
 		}
 		&__image {
 			order: 1;
@@ -1292,10 +1369,50 @@ body {
 	// Blog posts stay in single column on all screen sizes
 }
 
+@media (max-width: 991px) {
+	.about {
+		padding-bottom: ($grid-unit * 6);
+	}
+	.reviews {
+		padding-top: 0;
+	}
+}
+
 @media (max-width: 768px) {
 	.footer__wrapper {
 		flex-direction: column;
 		text-align: center;
+	}
+
+	.modal {
+		max-width: 92%;
+		max-height: 85vh;
+
+		&__content {
+			padding: ($grid-unit * 5) ($grid-unit * 4);
+		}
+
+		&__title {
+			font-size: clamp(1.25rem, 4vw, 1.5rem);
+			margin-bottom: ($grid-unit * 2);
+		}
+
+		&__description {
+			font-size: 0.95rem;
+			line-height: 1.6;
+
+			p {
+				margin-bottom: ($grid-unit * 1.5);
+			}
+		}
+
+		&__close {
+			top: ($grid-unit * 1);
+			right: ($grid-unit * 1);
+			width: 2rem;
+			height: 2rem;
+			font-size: 1.5rem;
+		}
 	}
 
 	.contact {
