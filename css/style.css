@@ -51,7 +51,7 @@ body.blog-page main {
   color: #ffffff;
 }
 .btn--primary:hover {
-  background-color: #103273;
+  background-color: rgb(15.8351648352, 49.6648351648, 115.1648351648);
   transform: translateY(-2px);
 }
 
@@ -68,8 +68,7 @@ body.blog-page main {
   left: 0;
   width: 100%;
   background-color: rgba(244, 241, 238, 0.95);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   z-index: 1001;
   border-bottom: 1px solid rgba(22, 69, 160, 0.05);
 }
@@ -389,7 +388,7 @@ body.blog-page main {
   transition: color 0.3s ease, opacity 0.3s ease;
 }
 .contact__info .contact__details li a:hover {
-  color: #103273;
+  color: rgb(15.8351648352, 49.6648351648, 115.1648351648);
   opacity: 0.95;
   text-decoration: underline;
 }
@@ -422,6 +421,9 @@ body.blog-page main {
   width: 28px;
   height: 28px;
   display: block;
+}
+.contact__info .booksy__widget {
+  margin-top: 1.25rem;
 }
 .contact__map {
   order: 2;
@@ -701,7 +703,7 @@ body.blog-page main {
   transition: all 0.3s ease;
 }
 .blog-post__read-more:hover, .blog-post__read-less:hover {
-  background-color: #103273;
+  background-color: rgb(15.8351648352, 49.6648351648, 115.1648351648);
   transform: translateY(-2px);
 }
 
@@ -775,13 +777,13 @@ body.blog-page main {
 .service-card__price {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #6a9f8c;
+  color: rgb(105.8695652174, 159.1304347826, 140.4891304348);
   line-height: 1.2;
 }
 .service-card__time {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #6a9f8c;
+  color: rgb(105.8695652174, 159.1304347826, 140.4891304348);
   line-height: 1.2;
 }
 .service-card__content {
@@ -810,7 +812,7 @@ body.blog-page main {
   justify-content: flex-start;
   padding: 0.5rem 0;
   background-color: transparent;
-  color: #89b3a4;
+  color: rgb(136.9130434783, 179.0869565217, 164.3260869565);
   border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
@@ -820,7 +822,7 @@ body.blog-page main {
   margin-top: auto;
 }
 .service-card__btn:hover {
-  color: #548272;
+  color: rgb(83.7391304348, 130.2608695652, 113.9782608696);
 }
 .service-card__btn:hover .service-card__btn-arrow {
   transform: translateX(0.55rem);
@@ -906,8 +908,7 @@ body.blog-page main {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   z-index: 2000;
   opacity: 0;
   visibility: hidden;
@@ -1026,7 +1027,7 @@ body.blog-page main {
   margin-bottom: 0.5rem;
 }
 .service-box__toggle:hover {
-  color: #488f7e;
+  color: rgb(71.5, 143, 126.3493150685);
 }
 .service-box__meta {
   display: flex;

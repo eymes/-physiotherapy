@@ -456,6 +456,9 @@ body {
 				display: block;
 			}
 		}
+		.booksy__widget{
+			margin-top: ($grid-unit * 2.5);
+		}
 	}
 
 	&__map {
